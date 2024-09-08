@@ -2,23 +2,30 @@
 session_start();
 include 'db_config.php';
 
-// Initialize cart session if not set
+// Initializeaza cartul daca nu e setat
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
-// Check if an item is being added to the cart
+// Check daca un item este adaugat in cos
 if (isset($_POST['add_to_cart'])) {
     $item_id = $_POST['item_id'];
-    // Add the item to the cart session array
+    // Adauga item-ul in cos
     $_SESSION['cart'][] = $item_id;
-    // Redirect back to avoid resubmission of form on page reload
+    // Redirect 
     header('Location: view_offers.php');
     exit();
 }
 
 // Verifică dacă există categoria setată în sesiune
-$category_filter = isset($_GET['category']) ? $_GET['category'] : '';
+if(isset($_GET['category'])){
+$_SESSION['category']= $_GET['category'];
+}
+
+if(isset($_SESSION['category']))
+ {
+    $category_filter=$_SESSION['category'];
+ }
 
 // Filtre din formularul utilizatorului
 $subcategory_filter = isset($_GET['subcategory']) ? $_GET['subcategory'] : '';
@@ -43,6 +50,8 @@ if (!empty($search_query)) {
     $params[] = "%$search_query%";
     $params[] = "%$search_query%";
     $types .= 'ss'; // Add two string types for the LIKE clauses
+    unset($category_filter);
+    unset($_SESSION['category']);
 }
 
 // Filtru pentru categoria din sesiune, dacă este setată
@@ -256,11 +265,12 @@ $maker_result = $conn->query($maker_query);
         <?php } else { ?>
             <p>Nu există oferte disponibile în acest moment.</p>
         <?php } ?>
-    </section>
+
 
     <footer>
         <p>&copy; <?php echo date('Y'); ?> Blank Electronics. All rights reserved.</p>
     </footer>
+    </section>
 </main>
 </body>
 </html>
